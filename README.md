@@ -2,6 +2,8 @@
 
 I decided to actually start working on my knowledge of prometheus/grafana/etc, I would start up a homelab. Actually getting my hands dirty with different VMs, networking issues, and monitoring/observability is the way I learn best, so I'm gonna just set up something in my own subnet sandbox and break it any way I please!
 
+![the current setup](homelab_diagram.png)
+
 ## Goals
 
 (for all the below, the eventual idea is to have them creatable from source control via automation)
