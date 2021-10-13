@@ -4,6 +4,30 @@ I decided to actually start working on my knowledge of prometheus/grafana/etc, I
 
 ![the current setup](homelab_diagram.png)
 
+## Specs
+
+- Raspberry Pi (CloudyPie)
+
+Pi 3 Model B Plus Rev 1.3, running Pi OS Lite (headless)
+ARMv7 rev 4 (v7l) 4 Core 1.2 GHz
+1 GB RAM
+
+Running the pihole, and probably not much else.
+
+- Raspberry Pi (Cloud Monet)
+
+Pi 4 Model B, running Pi OS Lite (headless)
+TBD
+4GB RAM
+
+Running the prometheus server, collecting metrics from the rest of the lab and displaying via grafana.
+
+- Mac Mini (Mac McCloud)
+
+2012 Mac Mini with 16GB RAM, i7 quad-core
+
+Running _some_ sort of services, probably scraping stuff and putting into S3...
+
 ## Goals
 
 (for all the below, the eventual idea is to have them creatable from source control via automation)
