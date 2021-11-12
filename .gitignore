@@ -1,2 +1,7 @@
+# host configuration with actual IP addresses
 ansible/hosts
 ansible/base_hosts
+
+# generated ssh keys
+ansible/homelab
+ansible/homelab.pub
