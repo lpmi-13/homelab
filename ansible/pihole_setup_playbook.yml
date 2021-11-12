@@ -50,6 +50,42 @@
       enabled: yes
       state: started
 
+  - name: Install docker dependencies
+    apt:
+      force_apt_get: yes
+      name:
+        - gnupg2
+        - software-properties-common
+  
+  - name: Add Docker apt key
+    apt_key:
+      url: https://download.docker.com/linux/raspbian/gpg
+      id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+  
+  - name: Add Docker apt repository
+    apt_repository:
+      repo: deb [arch=armhf] https://download.docker.com/linux/raspbian buster stable
+      filename: docker
+  
+  - name: Install Docker
+    apt:
+      force_apt_get: yes
+      name:
+        - docker-ce
+        - python-setuptools
+        - python-pip
+      install_recommends: no
+  
+  - name: Install Docker SDK for python
+    pip:
+      name: docker
+  
+  - name: Add user to docker group
+    user:
+      name: homelab
+      append: yes
+      groups: docker
+
   handlers:
 
   - name: Restart ssh
