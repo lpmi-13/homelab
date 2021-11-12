@@ -1,7 +1,7 @@
 #! /bin/sh
 
 if [ $# -eq 0 ]; then
-  echo "please pass in a name for the generated keys, for example: \n ./create_keys.sh pihole"
+  echo "please pass in a name for the generated keys, for example: \n ./create_keys.sh homelab"
 
   exit 1
 fi
