@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: 'node_health'
     static_configs:
-      - targets: ['192.168.1.3:9090', 'localhost:9090']
+      - targets: ['192.168.1.3:9100', 'localhost:9100']

@@ -6,27 +6,10 @@
 
   tasks:
 
-  - name: Update APT package cache
-    apt: update_cache=yes
-
-  - name: Add non-root user
-    user: name=adam password={{ upassword | password_hash('sha512') }} state=present shell=/bin/bash
-
-  - name: Set up authorized key for user
-    authorized_key: user=adam state=present key="{{lookup('file', '/home/adam/Desktop/projects/homelab/ansible/pihole.pub')}}"
-
-  - name: Remove sudo group rights
-    action: lineinfile dest=/etc/sudoers regexp="^%sudo" state=absent
-
-  - name: Add user to sudoers
-    action: lineinfile dest=/etc/sudoers regexp="deploy ALL" line="adam ALL=(ALL) NOPASSWD:ALL" state=present
-
-  - name: Disallow root SSH access
-    action: lineinfile dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
-    notify: Restart ssh
-
-  - name: Disallow password authentication
-    action: lineinfile dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
+  - name: Ensure prometheus user exists
+    user:
+      name: prometheus
+      shell: /bin/false
 
   - name: Download Node exporter
     get_url:
@@ -34,11 +17,13 @@
       dest: /tmp
       checksum: sha256:e7f4427a25f1870103588e4968c7dc8c1426c00a0c029d0183a9a7afdd61357b
 
-  - name: Create Node exporter folder in opt
+  - name: Create Node exporter folder in /usr/bin
     become: yes
     file:
       path: /usr/bin/nodeexporter
       state: directory
+      owner: prometheus
+      group: prometheus
       mode: '0777'
 
   - name: Extract Node exporter
@@ -48,30 +33,11 @@
        dest: /usr/bin/nodeexporter
        remote_src: yes
 
-  - name: Create Node exporter Service File
-    become: yes
-    file:
-        path: /etc/systemd/system/nodeexporter.service
-        state: touch
+  - name: Copy Node exporter Service File from local machine
+    copy:
+        src: node_exporter/nodeexporter.service
+        dest: /etc/systemd/system/nodeexporter.service
 
-  - name: Edit Node exporter Service File
-    become: yes
-    blockinfile:
-        path: /etc/systemd/system/nodeexporter.service
-        marker: ""
-        block: |
-          [Unit]
-          Description=Node Exporter
-          Documentation=https://prometheus.io/
-          After=network-online.target
-          [Service]
-          User=pi
-          Restart=on-failure
-          [Service]
-          User=pi
-          ExecStart=/usr/bin/nodeexporter/node_exporter-1.0.1.linux-armv7/node_exporter
-          [Install]
-          WantedBy=multi-user.target
   - name: systemd reload
     become: yes
     systemd:

@@ -53,12 +53,6 @@
        dest: /etc/prometheus/console_libraries
        remote_src: yes
 
-  - name: Create Prometheus Service File
-    become: yes
-    file:
-        path: /etc/systemd/system/prometheus.service
-        state: touch
-
   - name: Copy Prometheus Config file from local machine
     copy:
         src: prometheus/prometheus.yml
