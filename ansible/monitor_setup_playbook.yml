@@ -1,0 +1,91 @@
+---
+
+- name: Configure Monitor
+  hosts: monitor
+  become: yes
+
+  tasks:
+
+  - name: Ensure prometheus user exists
+    user:
+      name: prometheus
+      shell: /bin/false
+
+  - name: Download Prometheus server binary
+    get_url:
+      url: https://github.com/prometheus/prometheus/releases/download/v2.9.2/prometheus-2.9.2.linux-armv7.tar.gz
+      dest: /tmp
+
+  - name: Create Prometheus config folder
+    become: yes
+    file:
+      path: /etc/prometheus
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: '0755'
+
+  - name: Create Prometheus folder
+    become: yes
+    file:
+      path: /usr/bin/prometheus
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: '0755'
+
+  - name: Extract Prometheus binary
+    become: yes
+    unarchive:
+       src: /tmp/prometheus-2.9.2.linux-armv7.tar.gz
+       dest: /usr/bin/prometheus
+       remote_src: yes
+
+  - name: Copy consoles to config path
+    copy:
+       src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/consoles
+       dest: /etc/prometheus/consoles
+       remote_src: yes
+
+  - name: Copy console_libraries to config path
+    copy:
+       src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/console_libraries
+       dest: /etc/prometheus/console_libraries
+       remote_src: yes
+
+  - name: Create Prometheus Service File
+    become: yes
+    file:
+        path: /etc/systemd/system/prometheus.service
+        state: touch
+
+  - name: Copy Prometheus Config file from local machine
+    copy:
+        src: prometheus/prometheus.yml
+        dest: /etc/prometheus/prometheus.yml
+
+  - name: Copy Prometheus Service File from local machine
+    copy:
+        src: prometheus/prometheus.service
+        dest: /etc/systemd/system/prometheus.service
+
+  - name: create /var/lib/promtheus/data
+    file:
+      state: directory
+      path: /var/lib/prometheus/data
+      recurse: true
+      owner: prometheus
+      group: prometheus
+      mode: 0755
+
+  - name: systemd reload
+    become: yes
+    systemd:
+      daemon_reload: yes
+
+  - name: Start Prometheus service
+    become: yes
+    service:
+      name: prometheus
+      enabled: yes
+      state: started
