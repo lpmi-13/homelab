@@ -1,0 +1,7 @@
+[pihole]
+# let the base config playbook log in with default user/password so we can enable ssh login
+IP_ADDRESS_HERE ansible_user=pi ansible_password=raspberry
+
+[monitor]
+# let the base config playbook log in with default user/password so we can enable ssh login
+IP_ADDRESS_HERE ansible_user=pi ansible_password=raspberry
