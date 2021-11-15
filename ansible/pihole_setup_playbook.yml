@@ -94,6 +94,14 @@
       state: directory
       mode: 0755
 
+  - name: Create grafana directory
+    file:
+      path: "/home/homelab/grafana"
+      owner: "472" # this is to enable the container
+      group: "472" # to access the data dir
+      state: directory
+      mode: 0755
+
   - name: Create 2nd pihole directory
     file:
       path: "/home/homelab/pihole/pihole"
@@ -117,6 +125,7 @@
       name: pihole
       image: "pihole/pihole:2021.10.1"
       pull: yes
+      auto_remove: no
       restart_policy: unless-stopped
       env:
         TZ: "Europe/London"
@@ -150,6 +159,21 @@
       images: yes
       images_filters:
         dangling: false
+
+  - name: Start grafana container
+    docker_container:
+      name: grafana
+      image: "grafana/grafana:latest"
+      pull: yes
+      restart_policy: unless-stopped
+      auto_remove: no
+      network_mode: host
+      volumes:
+        - /home/homelab/grafana/data:/var/lib/grafana # data path
+      log_driver: json-file
+      log_options:
+        max-size: "10m"
+        max-file: "5"
 
   handlers:
 
