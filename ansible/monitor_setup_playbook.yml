@@ -11,6 +11,34 @@
       name: prometheus
       shell: /bin/false
 
+  - name: Download Node exporter
+    get_url:
+      url: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-armv7.tar.gz
+      dest: /tmp
+      checksum: sha256:e7f4427a25f1870103588e4968c7dc8c1426c00a0c029d0183a9a7afdd61357b
+
+  - name: Create Node exporter folder in /usr/bin
+    become: yes
+    file:
+      path: /usr/bin/nodeexporter
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: '0777'
+
+  - name: Extract Node exporter
+    become: yes
+    unarchive:
+      src: /tmp/node_exporter-1.0.1.linux-armv7.tar.gz
+      dest: /usr/bin/nodeexporter
+      remote_src: yes
+
+  - name: Copy Node exporter Service File from local machine
+    copy:
+      src: node_exporter/nodeexporter.service
+      dest: /etc/systemd/system/nodeexporter.service
+
+
   - name: Download Prometheus server binary
     get_url:
       url: https://github.com/prometheus/prometheus/releases/download/v2.9.2/prometheus-2.9.2.linux-armv7.tar.gz
@@ -37,31 +65,31 @@
   - name: Extract Prometheus binary
     become: yes
     unarchive:
-       src: /tmp/prometheus-2.9.2.linux-armv7.tar.gz
-       dest: /usr/bin/prometheus
-       remote_src: yes
+      src: /tmp/prometheus-2.9.2.linux-armv7.tar.gz
+      dest: /usr/bin/prometheus
+      remote_src: yes
 
   - name: Copy consoles to config path
     copy:
-       src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/consoles
-       dest: /etc/prometheus/consoles
-       remote_src: yes
+      src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/consoles
+      dest: /etc/prometheus/consoles
+      remote_src: yes
 
   - name: Copy console_libraries to config path
     copy:
-       src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/console_libraries
-       dest: /etc/prometheus/console_libraries
-       remote_src: yes
+      src: /usr/bin/prometheus/prometheus-2.9.2.linux-armv7/console_libraries
+      dest: /etc/prometheus/console_libraries
+      remote_src: yes
 
   - name: Copy Prometheus Config file from local machine
     copy:
-        src: prometheus/prometheus.yml
-        dest: /etc/prometheus/prometheus.yml
+      src: prometheus/prometheus.yml
+      dest: /etc/prometheus/prometheus.yml
 
   - name: Copy Prometheus Service File from local machine
     copy:
-        src: prometheus/prometheus.service
-        dest: /etc/systemd/system/prometheus.service
+      src: prometheus/prometheus.service
+      dest: /etc/systemd/system/prometheus.service
 
   - name: create /var/lib/promtheus/data
     file:
@@ -76,6 +104,13 @@
     become: yes
     systemd:
       daemon_reload: yes
+
+  - name: Start Node exporter service
+    become: yes
+    service:
+      name: nodeexporter
+      enabled: yes
+      state: started
 
   - name: Start Prometheus service
     become: yes
