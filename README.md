@@ -30,7 +30,7 @@ Running _some_ sort of services, probably scraping stuff and putting into S3...
 
 ## Setup Steps (Pi's)
 
-1. Get an SSD card (or whatever you're going to run the OS off of) and write the distribution you want. I'm currently using `2021-05-07-raspios-buster-armhf-lite`, but anything small should be fine.
+1. Get an SSD card (or whatever you're going to run the OS off of) and write the distribution you want. I'm currently using `2021-10-30-raspios-bullseye-armhf`, but anything small should be fine.
 
 2. After writing the OS, put a file called `ssh` (it can be empty, as long as the file exists) into the `/boot` directory of the SSD card. This will enable SSH on the first boot, without needing to SSH in manually and run `raspi-config` to enable it.
 https://forums.raspberrypi.com/viewtopic.php?t=129727
@@ -41,9 +41,9 @@ https://forums.raspberrypi.com/viewtopic.php?t=129727
 
 5. Run `setup_base_config.sh` to setup basic SSH access with the keys generated to the Pi's, and disable password authentication. If you run the playbook twice, you'll still be able to connect with a password for a minute or so, and I suspect this is because the SSH server needs to reset. Eventually, running that script should fail with an `unreachable` message, which is what we want!
 
-6. Now we're ready to run our custom setup for both the pihole and monitor isntances. Set up `ansbile/hosts` following the example in `ansible/hosts.example`. It doesn't matter which order you run the playbooks for the monitor or the pihole, so pick whichever order you want:
+6. Now we're ready to run our custom setup for both the pihole and monitor instances. Set up `ansbile/hosts` following the example in `ansible/hosts.example`. It doesn't matter which order you run the playbooks for the monitor or the pihole, so pick whichever order you want:
 
-- `bash setup_monitor.sh` (this still doesn't have grafana set up, but I'll get to that soon)
+- `bash setup_monitor.sh`
 - `bash setup_pihole.sh`
 
 7. If you have a more sensible home router, then all you need to do now is point the DNS config to your pihole instance IP address. If, on the other hand, you have one of those routers that won't let you _only_ set the DNS server, you'll need to do some funky stuff like turn off the DHCP for the router and set it...somewhere else, which is much more involved and basically the reason I set up the Netgear router on a subnet inside my home network.
