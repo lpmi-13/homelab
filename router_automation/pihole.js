@@ -1,11 +1,12 @@
 require('dotenv').config();
 const puppeteer = require('puppeteer');
 
+const HEADLESS_MODE = process.env.HEADLESS_MODE.toLowerCase() === 'true';
 const ROUTER_URL = process.env.ROUTER_URL;
 const piholeOctets = process.env.PIHOLE_IP.split('.');
 
 (async () => {
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: HEADLESS_MODE});
   const page = await browser.newPage();
   await page.authenticate({
       username: process.env.USER_NAME,
@@ -47,6 +48,8 @@ const piholeOctets = process.env.PIHOLE_IP.split('.');
   // this is basically going to immediately close, but that's fine
   await page.click('button[name="apply"]')
   await page.waitForNetworkIdle();
+
+  console.log('setting Pihole as the DNS server, please wait about a minute for this to take effect...');
 
   await browser.close();
 })();

@@ -1,10 +1,11 @@
 require('dotenv').config();
 const puppeteer = require('puppeteer');
 
+const HEADLESS_MODE = process.env.HEADLESS_MODE.toLowerCase() === 'true';
 const ROUTER_URL = process.env.ROUTER_URL;
 
 (async () => {
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: HEADLESS_MODE});
   const page = await browser.newPage();
   await page.authenticate({
       username: process.env.USER_NAME,
@@ -20,6 +21,8 @@ const ROUTER_URL = process.env.ROUTER_URL;
   // this is basically going to immediately close, but that's fine
   await page.click('button[name="apply"]')
   await page.waitForNetworkIdle();
+
+  console.log('setting ISP as DNS server, please wait about a minute for this to take effect...');
 
   await browser.close();
 })();
