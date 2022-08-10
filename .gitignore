@@ -5,3 +5,8 @@ ansible/base_hosts
 # generated ssh keys
 ansible/homelab
 ansible/homelab.pub
+
+# actual config for router automation
+.env
+
+node_modules

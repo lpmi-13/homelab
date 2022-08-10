@@ -12,15 +12,15 @@ Pi 3 Model B Plus Rev 1.3, running Pi OS Lite (headless)
 ARMv7 rev 4 (v7l) 4 Core 1.2 GHz
 1 GB RAM
 
-Running the pihole, and probably not much else.
+Running the prometheus server, collecting metrics from the rest of the lab.
 
 - Raspberry Pi (Cloud Monet)
 
-Pi 4 Model B, running Pi OS Lite (headless)
+Pi 4 Model B, running Pi OS Desktop
 TBD
 4GB RAM
 
-Running the prometheus server, collecting metrics from the rest of the lab and displaying via grafana.
+Running the pihole, as well as grafana, which is why I opted for the desktop so I could hook a monitor up to it.
 
 - Mac Mini (Mac McCloud)
 
@@ -41,12 +41,26 @@ https://forums.raspberrypi.com/viewtopic.php?t=129727
 
 5. Run `setup_base_config.sh` to setup basic SSH access with the keys generated to the Pi's, and disable password authentication. If you run the playbook twice, you'll still be able to connect with a password for a minute or so, and I suspect this is because the SSH server needs to reset. Eventually, running that script should fail with an `unreachable` message, which is what we want!
 
-6. Now we're ready to run our custom setup for both the pihole and monitor instances. Set up `ansbile/hosts` following the example in `ansible/hosts.example`. It doesn't matter which order you run the playbooks for the monitor or the pihole, so pick whichever order you want:
+6. Now we're ready to run our custom setup for both the pihole and monitor instances. Set up `ansbile/hosts` following the example in `ansible/hosts.example`.
+
+Note: make sure you update this block in `ansible/setup_pihole_playbook.yaml` to include the IP address of the pi you'd like to use as a pihole.
+
+```
+   - name: Set ServerIP addresses (single mode)
+     set_fact:
+       server_ip: "PUT_PIHOLE_IP_HERE"
+       execution_mode: "single node setup"
+```
+
+It doesn't matter which order you run the playbooks for the monitor or the pihole, so pick whichever order you want:
+
 
 - `bash setup_monitor.sh`
 - `bash setup_pihole.sh`
 
 7. If you have a more sensible home router, then all you need to do now is point the DNS config to your pihole instance IP address. If, on the other hand, you have one of those routers that won't let you _only_ set the DNS server, you'll need to do some funky stuff like turn off the DHCP for the router and set it...somewhere else, which is much more involved and basically the reason I set up the Netgear router on a subnet inside my home network.
+
+> Make sure to add the Pi IP addresses to the address reservations for the router, otherwise, they'll lose their DHCP lease and the IP might change, which is bad times if you're using the pihole for DNS resolution.
 
 8. Go ahead and surf with glee! You can check `http://PIHOLE_IP_ADDRESS/admin` to see all the delicious queries that are now being blocked automatically.
 
@@ -55,8 +69,10 @@ https://forums.raspberrypi.com/viewtopic.php?t=129727
 ## Connecting to the different instances if you want to poke around (but the whole selling point of ansible is that you shouldn't have to)
 
 ```
-ssh -i ansbile/homelab user@IP_HERE
+ssh -i ansible/homelab user@IP_HERE
 ```
+
+> The current playbook `ansible/base_config_playbook.yml` sets the user to `homelab`, so if you didn't change that, then use `homelab@IP_HERE` in the `ssh` command above
 
 ## Goals
 
