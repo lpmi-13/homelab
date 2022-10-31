@@ -78,6 +78,7 @@ ssh -i ansible/homelab user@IP_HERE
 
 (for all the below, the eventual idea is to have them creatable from source control via automation)
 
+- Learn to set up and configure home network monitoring (https://learn.netdata.cloud/guides/monitor/pi-hole-raspberry-pi)
 - Learn to set up and configure a prometheus instance
 - Learn to set up grafana dashboards customized to my heart's content
 - Learn to orchestrate some VMs in a repeatable and declarative fashion

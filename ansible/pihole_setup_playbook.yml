@@ -94,13 +94,13 @@
       state: directory
       mode: 0755
 
-  - name: Create grafana directory
-    file:
-      path: "/home/homelab/grafana"
-      owner: "472" # this is to enable the container
-      group: "472" # to access the data dir
-      state: directory
-      mode: 0755
+#  - name: Create grafana directory
+#    file:
+#      path: "/home/homelab/grafana"
+#      owner: "472" # this is to enable the container
+#      group: "472" # to access the data dir
+#      state: directory
+#      mode: 0755
 
   - name: Create 2nd pihole directory
     file:
@@ -160,20 +160,42 @@
       images_filters:
         dangling: false
 
-  - name: Start grafana container
+#  - name: Start grafana container
+#    docker_container:
+#      name: grafana
+#      image: "grafana/grafana:latest"
+#      pull: yes
+#      restart_policy: unless-stopped
+#      auto_remove: no
+#      network_mode: host
+#      volumes:
+#        - /home/homelab/grafana/data:/var/lib/grafana # data path
+#      log_driver: json-file
+#      log_options:
+#        max-size: "10m"
+#        max-file: "5"
+
+  - name: Start the netdata container
     docker_container:
-      name: grafana
-      image: "grafana/grafana:latest"
+      name: netdata
+      image: "netdata/netdata:latest"
       pull: yes
       restart_policy: unless-stopped
       auto_remove: no
       network_mode: host
       volumes:
-        - /home/homelab/grafana/data:/var/lib/grafana # data path
-      log_driver: json-file
-      log_options:
-        max-size: "10m"
-        max-file: "5"
+        - netdataconfig:/etc/netdata
+        - netdatalib:/var/lib/netdata
+        - netdatacache:/var/cache/netdata
+        - /etc/passwd:/host/etc/passwd:ro
+        - /etc/group:/host/etc/group:ro
+        - /proc:/host/proc:ro
+        - /sys:/host/sys:ro
+        - /etc/os-release:/host/etc/os-release:ro
+      capabilities:
+        - sys_ptrace
+      security_opts:
+        - "apparmor=unconfined"
 
   handlers:
 
