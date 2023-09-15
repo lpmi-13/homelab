@@ -117,7 +117,7 @@
 
   - name: Set ServerIP addresses (single mode)
     set_fact:
-      server_ip: "192.168.1.4"
+      server_ip: "10.0.0.4"
       execution_mode: "single node setup"
 
   - name: Start/Update pihole container
